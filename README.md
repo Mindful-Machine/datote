@@ -1,36 +1,99 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Datote
 
-## Getting Started
+Turn a link into a calendar event. Built for creators — share a link, your audience clicks once and the event lands in their calendar.
 
-First, run the development server:
+## What it does
+
+1. Creator fills in event details (title, date, time, duration, timezone, location, online link)
+2. App generates a unique shareable URL like `datote.app/e/abc123`
+3. Anyone who opens that link can add the event to **Google Calendar**, **Apple Calendar**, or **Outlook** in one click
+
+---
+
+## Running locally
+
+### Prerequisites
+
+- [Node.js](https://nodejs.org) v18 or later
+- npm (comes with Node)
+
+### Setup
 
 ```bash
+# 1. Clone the repo
+git clone https://github.com/Mindful-Machine/datote.git
+cd datote
+
+# 2. Install dependencies
+npm install
+
+# 3. Start the dev server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Then open **http://localhost:3000** in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Key URLs
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+| URL | What it is |
+|-----|------------|
+| `http://localhost:3000/` | Landing page |
+| `http://localhost:3000/new` | Create a new event |
+| `http://localhost:3000/e/[id]` | Shareable event page |
+| `http://localhost:3000/api/events` | POST — create event (JSON) |
+| `http://localhost:3000/api/events/[id]/ical` | GET — download .ics file |
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## Project structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── page.tsx                      # Landing page
+│   ├── new/page.tsx                  # Event creation form
+│   ├── e/[id]/
+│   │   ├── page.tsx                  # Shareable event page
+│   │   └── CalendarButtons.tsx       # Client component (browser detection)
+│   └── api/events/
+│       ├── route.ts                  # POST /api/events
+│       └── [id]/ical/route.ts        # GET /api/events/[id]/ical (.ics)
+└── lib/
+    └── store.ts                      # In-memory store (⚠️ replace with Redis before deploy)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+---
 
-## Deploy on Vercel
+## Deploying to Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+> ⚠️ **Before deploying:** the current store is in-memory and resets on every server restart. Replace it with Upstash Redis first (see below).
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 1. Add a database (Upstash Redis — free)
+
+1. Create a free account at [upstash.com](https://upstash.com)
+2. Create a new Redis database
+3. Copy `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`
+
+### 2. Deploy
+
+```bash
+# Push latest code to GitHub
+git push
+
+# Then go to vercel.com → New Project → import Mindful-Machine/datote
+# Add the two Upstash env vars in the Vercel dashboard
+```
+
+---
+
+## Tech stack
+
+- **Next.js 16** (App Router) + **React 19**
+- **TypeScript**
+- **Tailwind CSS v4**
+- **Geist** font (Vercel)
+- **Nominatim / OpenStreetMap** — free location autocomplete, no API key
+
+---
+
+*By [Mindful Machine](https://github.com/Mindful-Machine)*
