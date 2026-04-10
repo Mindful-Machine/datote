@@ -1,7 +1,5 @@
-import { NextResponse } from "next/server";
-import { EVENTS } from "@/lib/store";
+import { getEvent } from "@/lib/store";
 
-// "2026-03-10T19:30:00" → "20260310T193000"
 function toICalLocal(dateStr: string): string {
   const [datePart, timePart] = dateStr.split("T");
   const [year, month, day] = datePart.split("-").map(Number);
@@ -10,7 +8,6 @@ function toICalLocal(dateStr: string): string {
   return `${year}${p(month)}${p(day)}T${p(hour)}${p(minute)}00`;
 }
 
-// Add minutes to a local datetime string, return iCal local format.
 function addMinutes(dateStr: string, minutes: number): string {
   const [datePart, timePart] = dateStr.split("T");
   const [year, month, day] = datePart.split("-").map(Number);
@@ -27,16 +24,16 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   const { id } = await params;
-  const event = EVENTS[id];
+  const event = await getEvent(id);
 
   if (!event) {
-    return NextResponse.json({ error: "Event not found" }, { status: 404 });
+    return new Response("Event not found", { status: 404 });
   }
 
   const start = toICalLocal(event.date);
   const end = addMinutes(event.date, event.durationMin);
 
-  const ics = [
+  const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
     "PRODID:-//Datote//Datote//EN",
@@ -45,14 +42,12 @@ export async function GET(
     `SUMMARY:${event.title}`,
     `DTSTART;TZID=${event.timezone}:${start}`,
     `DTEND;TZID=${event.timezone}:${end}`,
-    `LOCATION:${event.location}`,
-    "END:VEVENT",
-    "END:VCALENDAR",
-  ].join("\r\n");
+  ];
+  if (event.location) lines.push(`LOCATION:${event.location}`);
+  if (event.onlineLink) lines.push(`URL:${event.onlineLink}`);
+  lines.push("END:VEVENT", "END:VCALENDAR");
 
-  return new Response(ics, {
-    headers: {
-      "Content-Type": "text/calendar; charset=utf-8",
-    },
+  return new Response(lines.join("\r\n"), {
+    headers: { "Content-Type": "text/calendar; charset=utf-8" },
   });
 }

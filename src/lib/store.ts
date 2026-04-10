@@ -1,3 +1,5 @@
+import { redis } from "./redis";
+
 export type EventData = {
   title: string;
   date: string;         // "2026-03-10T19:30:00" — local time in the given timezone
@@ -7,7 +9,11 @@ export type EventData = {
   onlineLink?: string;  // YouTube Live, TikTok, Zoom, etc. (optional)
 };
 
-// Make a truly shared store during dev (global variable)
-const g = globalThis as unknown as { __DATOTE_EVENTS__?: Record<string, EventData> };
+export async function getEvent(id: string): Promise<EventData | null> {
+  return redis.get<EventData>(`event:${id}`);
+}
 
-export const EVENTS: Record<string, EventData> = g.__DATOTE_EVENTS__ ?? (g.__DATOTE_EVENTS__ = {});
+export async function saveEvent(id: string, data: EventData): Promise<void> {
+  // Keep events for 1 year (in seconds)
+  await redis.set(`event:${id}`, data, { ex: 60 * 60 * 24 * 365 });
+}

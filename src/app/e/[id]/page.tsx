@@ -1,4 +1,4 @@
-import { EVENTS } from "@/lib/store";
+import { getEvent } from "@/lib/store";
 import { CalendarButtons } from "./CalendarButtons";
 
 function parseLocalParts(dateStr: string) {
@@ -49,7 +49,7 @@ function googleCalendarUrl(event: {
 
 export default async function EventPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
-  const event = EVENTS[id];
+  const event = await getEvent(id);
 
   if (!event) {
     return (
@@ -64,7 +64,6 @@ export default async function EventPage(props: { params: Promise<{ id: string }>
 
   return (
     <main style={{ maxWidth: 480, margin: "0 auto", padding: "60px 24px 80px" }}>
-      {/* Event card */}
       <div style={{
         padding: "28px 24px",
         borderRadius: 18,
@@ -92,13 +91,11 @@ export default async function EventPage(props: { params: Promise<{ id: string }>
         </div>
       </div>
 
-      {/* Calendar buttons */}
       <CalendarButtons
         icalHref={`/api/events/${id}/ical`}
         googleHref={googleCalendarUrl(event)}
       />
 
-      {/* Footer */}
       <p style={{ marginTop: 40, textAlign: "center", fontSize: 12, color: "#3F3F46" }}>
         Shared via <a href="/" style={{ color: "#71717A", textDecoration: "none" }}>Datote</a>
         {" · "}by Mindful Machine
