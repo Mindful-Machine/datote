@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 
 function GoogleCalIcon() {
   return (
@@ -49,27 +48,21 @@ export function CalendarButtons({
   icalHref: string;
   googleHref: string;
 }) {
-  const [showHint, setShowHint] = useState(false);
-
-  function handleIcalClick() {
-    const ua = navigator.userAgent;
-    const isSafari = /^((?!chrome|android).)*safari/i.test(ua);
-    if (!isSafari) setShowHint(true);
+  // webcal:// opens the native calendar app directly — works in Instagram IAB,
+  // Safari, and most desktop calendar apps (Apple Calendar, Outlook).
+  // Falls back to https:// download on platforms that don't support webcal://.
+  function handleIcalClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    const webcalUrl = `webcal://${window.location.host}${icalHref}`;
+    window.location.href = webcalUrl;
   }
 
   return (
     <div style={{ display: "grid", gap: 10 }}>
-      <div>
-        <a href={icalHref} onClick={handleIcalClick} style={btnBase}>
-          <AppleCalIcon />
-          <span>Add to Apple / Outlook Calendar</span>
-        </a>
-        {showHint && (
-          <p style={{ margin: "8px 0 0", fontSize: 12, textAlign: "center", color: "#71717A" }}>
-            File downloaded — double-click it to add to your calendar.
-          </p>
-        )}
-      </div>
+      <a href={icalHref} onClick={handleIcalClick} style={btnBase}>
+        <AppleCalIcon />
+        <span>Add to Apple / Outlook Calendar</span>
+      </a>
 
       <a href={googleHref} target="_blank" rel="noopener noreferrer" style={btnBase}>
         <GoogleCalIcon />
