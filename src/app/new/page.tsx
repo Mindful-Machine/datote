@@ -117,7 +117,7 @@ export default function NewEventPage() {
           href="/"
           style={{ fontSize: 13, color: "#71717A", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4, marginBottom: 24 }}
         >
-          ← Datote
+          ← Pindate
         </a>
         <h1 style={{ margin: 0, fontSize: 26, fontWeight: 700, letterSpacing: "-0.03em" }}>
           New event

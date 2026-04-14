@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Datote — Share events people actually add to their calendar",
+  title: "Pindate — Share events people actually add to their calendar",
   description: "Create a shareable link that adds your event straight into anyone's calendar. Works with Google Calendar, Apple Calendar, and Outlook.",
 };
 

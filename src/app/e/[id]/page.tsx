@@ -57,7 +57,7 @@ export default async function EventPage(props: { params: Promise<{ id: string }>
         <p style={{ fontSize: 48, margin: "0 0 16px" }}>🕳️</p>
         <h1 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 700 }}>Event not found</h1>
         <p style={{ margin: 0, color: "#71717A", fontSize: 14 }}>This link may have expired or never existed.</p>
-        <a href="/" style={{ marginTop: 24, fontSize: 14, color: "#A855F7", textDecoration: "none" }}>← Back to Datote</a>
+        <a href="/" style={{ marginTop: 24, fontSize: 14, color: "#A855F7", textDecoration: "none" }}>← Back to Pindate</a>
       </main>
     );
   }
@@ -97,7 +97,7 @@ export default async function EventPage(props: { params: Promise<{ id: string }>
       />
 
       <p style={{ marginTop: 40, textAlign: "center", fontSize: 12, color: "#3F3F46" }}>
-        Shared via <a href="/" style={{ color: "#71717A", textDecoration: "none" }}>Datote</a>
+        Shared via <a href="/" style={{ color: "#71717A", textDecoration: "none" }}>Pindate</a>
         {" · "}by Mindful Machine
       </p>
     </main>

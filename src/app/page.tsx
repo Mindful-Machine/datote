@@ -42,7 +42,7 @@ export default function Home() {
           backgroundClip: "text",
         }}
       >
-        Datote
+        Pindate
       </h1>
 
       <p
@@ -55,9 +55,9 @@ export default function Home() {
           lineHeight: 1.6,
         }}
       >
-        Turn a link into a calendar event.
+        Pin your event. Share a link.
         <br />
-        Share it. Your audience clicks once.
+        Your audience adds it in one click.
       </p>
 
       <a
