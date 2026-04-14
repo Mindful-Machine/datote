@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 function GoogleCalIcon() {
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -9,7 +7,6 @@ function GoogleCalIcon() {
   );
 }
 
-// Clean calendar icon for Apple/Outlook
 function AppleCalIcon() {
   return (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -49,31 +46,26 @@ export function CalendarButtons({
   icalHref: string;
   googleHref: string;
 }) {
-  const [showInstagramHint, setShowInstagramHint] = useState(false);
-
-  function handleIcalClick(e: React.MouseEvent<HTMLAnchorElement>) {
-    const isInstagram = /Instagram/.test(navigator.userAgent);
-    if (isInstagram) {
-      e.preventDefault();
-      setShowInstagramHint(true);
+  async function handleIcalClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    e.preventDefault();
+    try {
+      // Fetch .ics and trigger via data URI — skips the file download step on iOS
+      // and works inside Instagram's in-app browser.
+      const ics = await fetch(icalHref).then((r) => r.text());
+      const dataUri = `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
+      window.location.href = dataUri;
+    } catch {
+      // Fallback: direct download
+      window.location.href = icalHref;
     }
-    // Otherwise: let the .ics download happen normally
   }
 
   return (
     <div style={{ display: "grid", gap: 10 }}>
-      <div>
-        <a href={icalHref} onClick={handleIcalClick} style={btnBase}>
-          <AppleCalIcon />
-          <span>Add to Apple / Outlook Calendar</span>
-        </a>
-        {showInstagramHint && (
-          <p style={{ margin: "8px 0 0", fontSize: 12, textAlign: "center", color: "#71717A", lineHeight: 1.5 }}>
-            Instagram blocks calendar downloads.{" "}
-            Tap <strong style={{ color: "#A1A1AA" }}>···</strong> (top right) → <strong style={{ color: "#A1A1AA" }}>Open in Safari</strong>, then tap this button again.
-          </p>
-        )}
-      </div>
+      <a href={icalHref} onClick={handleIcalClick} style={btnBase}>
+        <AppleCalIcon />
+        <span>Add to Apple / Outlook Calendar</span>
+      </a>
 
       <a href={googleHref} target="_blank" rel="noopener noreferrer" style={btnBase}>
         <GoogleCalIcon />
