@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+
 function GoogleCalIcon() {
   return (
     // eslint-disable-next-line @next/next/no-img-element
@@ -46,26 +48,40 @@ export function CalendarButtons({
   icalHref: string;
   googleHref: string;
 }) {
-  async function handleIcalClick(e: React.MouseEvent<HTMLAnchorElement>) {
-    e.preventDefault();
-    try {
-      // Fetch .ics and trigger via data URI — skips the file download step on iOS
-      // and works inside Instagram's in-app browser.
-      const ics = await fetch(icalHref).then((r) => r.text());
-      const dataUri = `data:text/calendar;charset=utf8,${encodeURIComponent(ics)}`;
-      window.location.href = dataUri;
-    } catch {
-      // Fallback: direct download
-      window.location.href = icalHref;
+  const [showInstagramHint, setShowInstagramHint] = useState(false);
+
+  function handleIcalClick(e: React.MouseEvent<HTMLAnchorElement>) {
+    const isInstagram = /Instagram/.test(navigator.userAgent);
+    if (isInstagram) {
+      e.preventDefault();
+      setShowInstagramHint(true);
     }
   }
 
   return (
     <div style={{ display: "grid", gap: 10 }}>
-      <a href={icalHref} onClick={handleIcalClick} style={btnBase}>
-        <AppleCalIcon />
-        <span>Add to Apple / Outlook Calendar</span>
-      </a>
+      <div>
+        <a href={icalHref} onClick={handleIcalClick} style={btnBase}>
+          <AppleCalIcon />
+          <span>Add to Apple / Outlook Calendar</span>
+        </a>
+        {showInstagramHint && (
+          <div style={{
+            marginTop: 10,
+            padding: "12px 14px",
+            borderRadius: 10,
+            background: "rgba(168, 85, 247, 0.08)",
+            border: "1px solid rgba(168, 85, 247, 0.2)",
+            fontSize: 13,
+            color: "#A1A1AA",
+            lineHeight: 1.6,
+            textAlign: "center",
+          }}>
+            Tap <strong style={{ color: "#FAFAFA" }}>···</strong> in the top-right corner<br />
+            then <strong style={{ color: "#FAFAFA" }}>Open in Safari</strong> → tap this button again
+          </div>
+        )}
+      </div>
 
       <a href={googleHref} target="_blank" rel="noopener noreferrer" style={btnBase}>
         <GoogleCalIcon />
