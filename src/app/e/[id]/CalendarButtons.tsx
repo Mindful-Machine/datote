@@ -2,32 +2,10 @@
 
 import { useState } from "react";
 
-// Matches the real Google Calendar icon: white base, blue header, 4 colored quadrants, date number
 function GoogleCalIcon() {
   return (
-    <svg width="22" height="22" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
-      {/* White base */}
-      <rect x="6" y="6" width="36" height="36" rx="4" fill="white" />
-      {/* Blue top header */}
-      <rect x="6" y="6" width="36" height="10" rx="4" fill="#4285F4" />
-      <rect x="6" y="12" width="36" height="4" fill="#4285F4" />
-      {/* Four colored quadrants below header */}
-      {/* Top-left: red */}
-      <rect x="6" y="16" width="18" height="13" fill="#EA4335" />
-      {/* Top-right: blue */}
-      <rect x="24" y="16" width="18" height="13" fill="#4285F4" />
-      {/* Bottom-left: yellow */}
-      <rect x="6" y="29" width="18" height="13" rx="0" fill="#FBBC05" />
-      <rect x="6" y="35" width="18" height="7" rx="4" fill="#FBBC05" />
-      {/* Bottom-right: green */}
-      <rect x="24" y="29" width="18" height="13" fill="#34A853" />
-      <rect x="24" y="35" width="18" height="7" rx="4" fill="#34A853" />
-      {/* White grid lines */}
-      <rect x="23" y="6" width="2" height="36" fill="white" />
-      <rect x="6" y="28" width="36" height="2" fill="white" />
-      {/* Date number */}
-      <text x="24" y="27" textAnchor="middle" fontSize="11" fontWeight="800" fill="white" fontFamily="Arial, sans-serif">14</text>
-    </svg>
+    // eslint-disable-next-line @next/next/no-img-element
+    <img src="/google-calandar.png" alt="Google Calendar" width={22} height={22} style={{ borderRadius: 4 }} />
   );
 }
 
@@ -52,8 +30,8 @@ const btnBase: React.CSSProperties = {
   width: "100%",
   padding: "14px 18px",
   borderRadius: 12,
-  border: "1px solid #27272A",
-  background: "#111113",
+  border: "1px solid rgba(168, 85, 247, 0.25)",
+  background: "linear-gradient(135deg, #111113 0%, rgba(124, 58, 237, 0.08) 100%)",
   color: "#FAFAFA",
   textDecoration: "none",
   fontSize: 15,
