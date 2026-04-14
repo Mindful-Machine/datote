@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 
 function GoogleCalIcon() {
   return (
@@ -48,21 +49,31 @@ export function CalendarButtons({
   icalHref: string;
   googleHref: string;
 }) {
-  // webcal:// opens the native calendar app directly — works in Instagram IAB,
-  // Safari, and most desktop calendar apps (Apple Calendar, Outlook).
-  // Falls back to https:// download on platforms that don't support webcal://.
+  const [showInstagramHint, setShowInstagramHint] = useState(false);
+
   function handleIcalClick(e: React.MouseEvent<HTMLAnchorElement>) {
-    e.preventDefault();
-    const webcalUrl = `webcal://${window.location.host}${icalHref}`;
-    window.location.href = webcalUrl;
+    const isInstagram = /Instagram/.test(navigator.userAgent);
+    if (isInstagram) {
+      e.preventDefault();
+      setShowInstagramHint(true);
+    }
+    // Otherwise: let the .ics download happen normally
   }
 
   return (
     <div style={{ display: "grid", gap: 10 }}>
-      <a href={icalHref} onClick={handleIcalClick} style={btnBase}>
-        <AppleCalIcon />
-        <span>Add to Apple / Outlook Calendar</span>
-      </a>
+      <div>
+        <a href={icalHref} onClick={handleIcalClick} style={btnBase}>
+          <AppleCalIcon />
+          <span>Add to Apple / Outlook Calendar</span>
+        </a>
+        {showInstagramHint && (
+          <p style={{ margin: "8px 0 0", fontSize: 12, textAlign: "center", color: "#71717A", lineHeight: 1.5 }}>
+            Instagram blocks calendar downloads.{" "}
+            Tap <strong style={{ color: "#A1A1AA" }}>···</strong> (top right) → <strong style={{ color: "#A1A1AA" }}>Open in Safari</strong>, then tap this button again.
+          </p>
+        )}
+      </div>
 
       <a href={googleHref} target="_blank" rel="noopener noreferrer" style={btnBase}>
         <GoogleCalIcon />
