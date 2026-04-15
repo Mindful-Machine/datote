@@ -378,7 +378,8 @@ export default function NewEventPage() {
         )}
 
         {/* Submit */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+          <span style={{ fontSize: 12, color: "#3F3F46", fontStyle: "italic" }}>{t("saveTheDate")}</span>
           <button
             type="submit"
             disabled={!canSubmit || loading}

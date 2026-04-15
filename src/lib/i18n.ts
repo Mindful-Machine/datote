@@ -3,7 +3,8 @@ export type Lang = "en" | "fr";
 export const translations = {
   en: {
     // Landing
-    tagline: "Share your event. Fans save it to their calendar in one tap.",
+    tagline: "One link. One tap. On their calendar.",
+    saveTheDate: "link that saves the date",
     cta: "Create event →",
     by: "Mindful Machine",
 
@@ -38,7 +39,8 @@ export const translations = {
   },
   fr: {
     // Landing
-    tagline: "Partagez votre événement. Vos fans l'ajoutent à leur agenda en un tap.",
+    tagline: "Un lien. Un tap. Dans leur agenda.",
+    saveTheDate: "le lien qui retient la date",
     cta: "Créer un événement →",
     by: "Mindful Machine",
 
