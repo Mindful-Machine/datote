@@ -251,12 +251,11 @@ export default function NewEventPage() {
         ))}
       </div>
 
-      {/* Brand header */}
       {/* Form header */}
       <div style={{
         borderTop: "2px solid transparent",
         borderImage: "linear-gradient(90deg, #A855F7, #7C3AED) 1",
-        paddingTop: 28, marginBottom: 8,
+        paddingTop: 28, marginBottom: 8, marginTop: 48,
       }}>
         <h1 style={{ margin: "0 0 20px", fontSize: 20, fontWeight: 700, letterSpacing: "-0.03em" }}>{t("newEvent")}</h1>
       </div>
