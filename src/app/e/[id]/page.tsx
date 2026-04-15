@@ -24,11 +24,10 @@ function toICalLocal(dateStr: string): string {
 
 function addMinutes(dateStr: string, minutes: number): string {
   const { year, month, day, hour, minute } = parseLocalParts(dateStr);
-  const total = hour * 60 + minute + minutes;
-  const endHour = Math.floor(total / 60) % 24;
-  const endMinute = total % 60;
+  const end = new Date(year, month - 1, day, hour, minute);
+  end.setMinutes(end.getMinutes() + minutes);
   const p = (n: number) => String(n).padStart(2, "0");
-  return `${year}${p(month)}${p(day)}T${p(endHour)}${p(endMinute)}00`;
+  return `${end.getFullYear()}${p(end.getMonth() + 1)}${p(end.getDate())}T${p(end.getHours())}${p(end.getMinutes())}00`;
 }
 
 function formatDisplay(dateStr: string, timezone: string, durationMin: number): string {
@@ -36,8 +35,10 @@ function formatDisplay(dateStr: string, timezone: string, durationMin: number): 
   const p = (n: number) => String(n).padStart(2, "0");
   const monthName = new Date(year, month - 1, day).toLocaleString("en-US", { month: "long" });
   const startTime = `${p(hour)}:${p(minute)}`;
-  const totalEnd = hour * 60 + minute + durationMin;
-  const endTime = `${p(Math.floor(totalEnd / 60) % 24)}:${p(totalEnd % 60)}`;
+  const end = new Date(year, month - 1, day, hour, minute);
+  end.setMinutes(end.getMinutes() + durationMin);
+  const crossesMidnight = end.getDate() !== day || end.getMonth() !== month - 1;
+  const endTime = `${p(end.getHours())}:${p(end.getMinutes())}${crossesMidnight ? " +1" : ""}`;
   return `${monthName} ${day}, ${year} · ${startTime} – ${endTime} · ${timezone}`;
 }
 
