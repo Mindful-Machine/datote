@@ -35,6 +35,7 @@ export const translations = {
     eventNotFound: "Event not found",
     eventNotFoundDesc: "This link may have expired or never existed.",
     backToHome: "← Back to Pindate",
+    modifyEvent: "← Modify event",
     instagramHint: "Tap ··· in the top-right corner\nthen Open in Safari → tap this button again",
   },
   fr: {
@@ -71,6 +72,7 @@ export const translations = {
     eventNotFound: "Événement introuvable",
     eventNotFoundDesc: "Ce lien a peut-être expiré ou n'existe pas.",
     backToHome: "← Retour à Pindate",
+    modifyEvent: "← Modifier l'événement",
     instagramHint: "Appuyez sur ··· en haut à droite\npuis Ouvrir dans Safari → appuyez à nouveau sur ce bouton",
   },
 } satisfies Record<Lang, Record<string, string>>;

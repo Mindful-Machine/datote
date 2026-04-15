@@ -31,11 +31,14 @@ function addMinutes(dateStr: string, minutes: number): string {
   return `${year}${p(month)}${p(day)}T${p(endHour)}${p(endMinute)}00`;
 }
 
-function formatDisplay(dateStr: string, timezone: string): string {
+function formatDisplay(dateStr: string, timezone: string, durationMin: number): string {
   const { year, month, day, hour, minute } = parseLocalParts(dateStr);
   const p = (n: number) => String(n).padStart(2, "0");
   const monthName = new Date(year, month - 1, day).toLocaleString("en-US", { month: "long" });
-  return `${monthName} ${day}, ${year} · ${p(hour)}:${p(minute)} · ${timezone}`;
+  const startTime = `${p(hour)}:${p(minute)}`;
+  const totalEnd = hour * 60 + minute + durationMin;
+  const endTime = `${p(Math.floor(totalEnd / 60) % 24)}:${p(totalEnd % 60)}`;
+  return `${monthName} ${day}, ${year} · ${startTime} – ${endTime} · ${timezone}`;
 }
 
 function googleCalendarUrl(event: {
@@ -55,9 +58,10 @@ function googleCalendarUrl(event: {
   return `https://calendar.google.com/calendar/render?${params.toString()}`;
 }
 
-export default async function EventPage(props: { params: Promise<{ id: string }> }) {
-  const { id } = await props.params;
-  const [event, lang] = await Promise.all([getEvent(id), serverLang()]);
+export default async function EventPage(props: { params: Promise<{ id: string }>; searchParams: Promise<{ edit?: string }> }) {
+  const [{ id }, { edit }, lang] = await Promise.all([props.params, props.searchParams, serverLang()]);
+  const [event] = await Promise.all([getEvent(id)]);
+  const isCreator = edit === "1";
   const s = translations[lang];
 
   if (!event) {
@@ -72,7 +76,12 @@ export default async function EventPage(props: { params: Promise<{ id: string }>
   }
 
   return (
-    <main style={{ maxWidth: 480, margin: "0 auto", padding: "60px 24px 80px" }}>
+    <main style={{ maxWidth: 480, margin: "0 auto", padding: "90px 24px 80px" }}>
+      {isCreator && (
+        <a href="/new" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginBottom: 20, fontSize: 13, color: "#71717A", textDecoration: "none" }}>
+          {s.modifyEvent}
+        </a>
+      )}
       <div style={{
         padding: "28px 24px",
         borderRadius: 18,
@@ -85,8 +94,8 @@ export default async function EventPage(props: { params: Promise<{ id: string }>
         </h1>
 
         <div style={{ display: "grid", gap: 10 }}>
-          <Meta icon="📅" text={formatDisplay(event.date, event.timezone)} />
           {event.location && <Meta icon="📍" text={event.location} />}
+          <Meta icon="📅" text={formatDisplay(event.date, event.timezone, event.durationMin)} />
           {/* Links — handle both new `links[]` and legacy `onlineLink` */}
           {(event.links ?? (event.onlineLink ? [event.onlineLink] : [])).map((url, i) => (
             <Meta
