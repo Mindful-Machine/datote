@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import { useLang, LANG_LABELS } from "@/lib/useLang";
+import type { Lang } from "@/lib/i18n";
 
 function GoogleCalIcon() {
   return (
@@ -48,6 +50,7 @@ export function CalendarButtons({
   icalHref: string;
   googleHref: string;
 }) {
+  const { t, lang, setLang } = useLang();
   const [showInstagramHint, setShowInstagramHint] = useState(false);
 
   function handleIcalClick(e: React.MouseEvent<HTMLAnchorElement>) {
@@ -58,35 +61,57 @@ export function CalendarButtons({
     }
   }
 
+  const hintLines = t("instagramHint").split("\n");
+
   return (
     <div style={{ display: "grid", gap: 10 }}>
-      <div>
-        <a href={icalHref} onClick={handleIcalClick} style={btnBase}>
-          <AppleCalIcon />
-          <span>Add to Apple / Outlook Calendar</span>
-        </a>
-        {showInstagramHint && (
-          <div style={{
-            marginTop: 10,
-            padding: "12px 14px",
-            borderRadius: 10,
-            background: "rgba(168, 85, 247, 0.08)",
-            border: "1px solid rgba(168, 85, 247, 0.2)",
-            fontSize: 13,
-            color: "#A1A1AA",
-            lineHeight: 1.6,
-            textAlign: "center",
+      {/* Language toggle */}
+      <div style={{ display: "flex", justifyContent: "flex-end", gap: 4, marginBottom: 2 }}>
+        {(["en", "fr"] as const).map((l: Lang) => (
+          <button key={l} onClick={() => setLang(l)} style={{
+            padding: "4px 10px", borderRadius: 6, border: "1px solid",
+            borderColor: lang === l ? "#A855F7" : "#27272A",
+            background: lang === l ? "rgba(168,85,247,0.1)" : "transparent",
+            color: lang === l ? "#A855F7" : "#52525B",
+            fontSize: 12, fontWeight: 500, cursor: "pointer",
+            display: "flex", alignItems: "center", gap: 5,
           }}>
-            Tap <strong style={{ color: "#FAFAFA" }}>···</strong> in the top-right corner<br />
-            then <strong style={{ color: "#FAFAFA" }}>Open in Safari</strong> → tap this button again
-          </div>
-        )}
+            <span style={{ fontSize: 14 }}>{LANG_LABELS[l].flag}</span>
+            {LANG_LABELS[l].name}
+          </button>
+        ))}
       </div>
 
-      <a href={googleHref} target="_blank" rel="noopener noreferrer" style={btnBase}>
-        <GoogleCalIcon />
-        <span>Add to Google Calendar</span>
-      </a>
+      {/* Buttons side by side — Apple left, Google right */}
+      <div style={{ display: "flex", gap: 10 }}>
+        <a href={icalHref} onClick={handleIcalClick} style={{ ...btnBase, flex: 1 }}>
+          <AppleCalIcon />
+          <span>{t("addToApple")}</span>
+        </a>
+        <a href={googleHref} target="_blank" rel="noopener noreferrer" style={{ ...btnBase, flex: 1 }}>
+          <GoogleCalIcon />
+          <span>{t("addToGoogle")}</span>
+        </a>
+      </div>
+
+      {showInstagramHint && (
+        <div style={{
+          padding: "12px 14px", borderRadius: 10,
+          background: "rgba(168, 85, 247, 0.08)",
+          border: "1px solid rgba(168, 85, 247, 0.2)",
+          fontSize: 13, color: "#A1A1AA", lineHeight: 1.6, textAlign: "center",
+        }}>
+          {hintLines[0].split("···").map((part, i) => (
+            i === 0 ? <span key={i}>{part}</span>
+            : <span key={i}><strong style={{ color: "#FAFAFA" }}>···</strong>{part}</span>
+          ))}
+          <br />
+          {hintLines[1]?.split("Open in Safari").map((part, i) => (
+            i === 0 ? <span key={i}>{part}</span>
+            : <span key={i}><strong style={{ color: "#FAFAFA" }}>Open in Safari</strong>{part}</span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ export async function POST(req: Request) {
     timezone: body.timezone ?? "UTC",
     durationMin: body.durationMin ?? 60,
     location: body.location || undefined,
-    onlineLink: body.onlineLink || undefined,
+    links: Array.isArray(body.links) && body.links.length > 0 ? body.links : undefined,
   });
 
   return NextResponse.json({ id, link: `/e/${id}` });
