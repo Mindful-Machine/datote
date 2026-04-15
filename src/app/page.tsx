@@ -13,7 +13,7 @@ export default function Home() {
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        padding: "0 24px",
+        padding: "80px 24px 0",
         textAlign: "center",
         gap: 0,
       }}
