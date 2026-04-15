@@ -107,7 +107,7 @@ export default async function EventPage(props: { params: Promise<{ id: string }>
         googleHref={googleCalendarUrl(event)}
       />
 
-      <footer style={{ marginTop: 40, textAlign: "center", fontSize: 12, color: "#3F3F46" }}>
+      <footer style={{ marginTop: 64, textAlign: "center", fontSize: 12, color: "#3F3F46" }}>
         {s.by}
       </footer>
     </main>

@@ -37,76 +37,35 @@ function getDefaultDateTime() {
   return { dateISO: `${year}-${month}-${day}`, time: `${hours}:${mins}` };
 }
 
-const defaults = getDefaultDateTime();
 const HOUR_OPTIONS = Array.from({ length: 24 }, (_, i) => i);  // 0–23
 const MIN_OPTIONS  = Array.from({ length: 60 }, (_, i) => i);  // 0–59
-const ITEM_H = 36; // matches d-input height
 
-// ─── Compact Apple-style scroll wheel column ─────────────────────────────────
-// Looks like a regular input — same height — but scrollable to change value.
-function WheelColumn({
-  options,
-  value,
-  onChange,
-  fmt,
-}: {
+// ─── Click-to-open duration picker ───────────────────────────────────────────
+function DurationList({ options, value, onChange }: {
   options: number[];
   value: number;
   onChange: (v: number) => void;
-  fmt?: (v: number) => string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const didMount = useRef(false);
-
   useEffect(() => {
-    if (didMount.current) return;
-    didMount.current = true;
+    if (!ref.current) return;
     const idx = options.indexOf(value);
-    if (ref.current && idx >= 0) ref.current.scrollTop = idx * ITEM_H;
+    if (idx >= 0) ref.current.scrollTop = Math.max(0, (idx - 2) * 36);
   }, [options, value]);
 
-  function onScroll() {
-    if (timer.current) clearTimeout(timer.current);
-    timer.current = setTimeout(() => {
-      if (!ref.current) return;
-      const idx = Math.round(ref.current.scrollTop / ITEM_H);
-      const clamped = Math.max(0, Math.min(idx, options.length - 1));
-      ref.current.scrollTop = clamped * ITEM_H;
-      onChange(options[clamped]);
-    }, 80);
-  }
-
   return (
-    <div
-      ref={ref}
-      className="wheel-scroll"
-      onScroll={onScroll}
-      style={{
-        width: 32,
-        height: ITEM_H,
-        overflowY: "scroll",
-        scrollSnapType: "y mandatory",
-        textAlign: "center",
-      }}
-    >
+    <div ref={ref} className="wheel-scroll" style={{ maxHeight: 180, overflowY: "auto" }}>
       {options.map((opt) => (
         <div
           key={opt}
+          onMouseDown={(e) => { e.preventDefault(); onChange(opt); }}
           style={{
-            height: ITEM_H,
-            scrollSnapAlign: "start",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontSize: 14,
-            fontWeight: 600,
-            color: "#FAFAFA",
-            userSelect: "none",
+            padding: "9px 20px", fontSize: 14, cursor: "pointer", textAlign: "center",
+            fontWeight: opt === value ? 600 : 400,
+            color: opt === value ? "#A855F7" : "#FAFAFA",
+            background: opt === value ? "rgba(168,85,247,0.08)" : "transparent",
           }}
-        >
-          {fmt ? fmt(opt) : String(opt).padStart(2, "0")}
-        </div>
+        >{String(opt).padStart(2, "0")}</div>
       ))}
     </div>
   );
@@ -115,24 +74,51 @@ function WheelColumn({
 function DurationPicker({ value, onChange }: { value: number; onChange: (min: number) => void }) {
   const hours = Math.floor(value / 60);
   const minutes = value % 60;
+  const [open, setOpen] = useState<"h" | "m" | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function handler(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(null);
+      }
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, [open]);
+
   return (
-    <div
-      className="d-input"
-      style={{ display: "flex", alignItems: "center", gap: 2, padding: "0 12px", cursor: "default" }}
-    >
-      <WheelColumn
-        options={HOUR_OPTIONS}
-        value={hours}
-        onChange={(h) => onChange(h * 60 + minutes)}
-      />
-      <span style={{ color: "#52525B", fontSize: 13, fontWeight: 500, paddingBottom: 1 }}>h</span>
-      <WheelColumn
-        options={MIN_OPTIONS}
-        value={minutes}
-        onChange={(m) => onChange(hours * 60 + m)}
-        fmt={(v) => String(v).padStart(2, "0")}
-      />
-      <span style={{ color: "#52525B", fontSize: 13, fontWeight: 500, paddingBottom: 1 }}>m</span>
+    <div ref={containerRef} style={{ position: "relative" }}>
+      <div className="d-input" style={{ display: "flex", alignItems: "center", gap: 4, padding: "0 12px", userSelect: "none" }}>
+        <span
+          onClick={() => setOpen(open === "h" ? null : "h")}
+          style={{ cursor: "pointer", fontWeight: 600, fontSize: 14, minWidth: 22, textAlign: "center", color: open === "h" ? "#A855F7" : "#FAFAFA" }}
+        >{String(hours).padStart(2, "0")}</span>
+        <span style={{ color: "#52525B", fontSize: 13 }}>h</span>
+        <span
+          onClick={() => setOpen(open === "m" ? null : "m")}
+          style={{ cursor: "pointer", fontWeight: 600, fontSize: 14, minWidth: 22, textAlign: "center", color: open === "m" ? "#A855F7" : "#FAFAFA" }}
+        >{String(minutes).padStart(2, "0")}</span>
+        <span style={{ color: "#52525B", fontSize: 13 }}>m</span>
+      </div>
+      {open && (
+        <div style={{
+          position: "absolute", top: "calc(100% + 4px)",
+          left: open === "h" ? 0 : "auto", right: open === "m" ? 0 : "auto",
+          zIndex: 20, background: "#111113", border: "1px solid #27272A", borderRadius: 10,
+          overflow: "hidden", minWidth: 72,
+        }}>
+          <DurationList
+            options={open === "h" ? HOUR_OPTIONS : MIN_OPTIONS}
+            value={open === "h" ? hours : minutes}
+            onChange={(v) => {
+              onChange(open === "h" ? v * 60 + minutes : hours * 60 + v);
+              setOpen(null);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -141,8 +127,8 @@ function DurationPicker({ value, onChange }: { value: number; onChange: (min: nu
 export default function NewEventPage() {
   const { t, lang, setLang } = useLang();
   const [title, setTitle]       = useState("");
-  const [dateISO, setDateISO]   = useState(defaults.dateISO);
-  const [time, setTime]         = useState(defaults.time);
+  const [dateISO, setDateISO]   = useState("");
+  const [time, setTime]         = useState("");
   const [timezone, setTimezone] = useState("Europe/Paris");
   const [durationMin, setDurationMin] = useState(120);
   const [location, setLocation] = useState("");
@@ -279,6 +265,7 @@ export default function NewEventPage() {
           </Field>
           <Field label={t("time")} emoji="🕐">
             <select className="d-input" value={time} onChange={(e) => setTime(e.target.value)}>
+              <option value="" disabled>hh:mm</option>
               {TIME_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
             </select>
           </Field>
@@ -391,10 +378,7 @@ export default function NewEventPage() {
         )}
 
         {/* Submit */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-          <span style={{ fontSize: 12, color: "#52525B" }}>
-            {dateISO && time ? `${dateISO} · ${time} · ${timezone}` : ""}
-          </span>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12 }}>
           <button
             type="submit"
             disabled={!canSubmit || loading}

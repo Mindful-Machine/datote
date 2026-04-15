@@ -5,7 +5,7 @@ export const translations = {
     // Landing
     tagline: "Share your event. Fans save it to their calendar in one tap.",
     cta: "Create event →",
-    by: "by Mindful Machine",
+    by: "Mindful Machine",
 
     // New event form
     newEvent: "New event",
@@ -40,7 +40,7 @@ export const translations = {
     // Landing
     tagline: "Partagez votre événement. Vos fans l'ajoutent à leur agenda en un tap.",
     cta: "Créer un événement →",
-    by: "par Mindful Machine",
+    by: "Mindful Machine",
 
     // New event form
     newEvent: "Nouvel événement",

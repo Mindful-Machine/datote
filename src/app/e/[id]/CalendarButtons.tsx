@@ -66,7 +66,7 @@ export function CalendarButtons({
   return (
     <div style={{ display: "grid", gap: 10 }}>
       {/* Language toggle */}
-      <div style={{ display: "flex", justifyContent: "flex-end", gap: 4, marginBottom: 2 }}>
+      <div style={{ position: "fixed", top: 16, right: 16, display: "flex", gap: 4, zIndex: 50 }}>
         {(["en", "fr"] as const).map((l: Lang) => (
           <button key={l} onClick={() => setLang(l)} style={{
             padding: "4px 10px", borderRadius: 6, border: "1px solid",
