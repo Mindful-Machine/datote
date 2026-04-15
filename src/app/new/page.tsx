@@ -252,21 +252,6 @@ export default function NewEventPage() {
       </div>
 
       {/* Brand header */}
-      <div style={{ textAlign: "center", marginBottom: 44 }}>
-        <a href="/" style={{ textDecoration: "none", display: "inline-flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-          <div style={{
-            width: 44, height: 44, borderRadius: 13,
-            background: "linear-gradient(135deg, #A855F7, #7C3AED)",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20,
-          }}>📅</div>
-          <span style={{
-            fontSize: 22, fontWeight: 800, letterSpacing: "-0.03em",
-            background: "linear-gradient(135deg, #FAFAFA 40%, #A855F7 100%)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
-          }}>Pindate</span>
-        </a>
-      </div>
-
       {/* Form header */}
       <div style={{
         borderTop: "2px solid transparent",
