@@ -58,3 +58,12 @@ body {
 .d-suggestion:hover {
   background: var(--surface2);
 }
+
+/* Duration wheel picker — hide scrollbar across browsers */
+.wheel-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.wheel-scroll::-webkit-scrollbar {
+  display: none;
+}

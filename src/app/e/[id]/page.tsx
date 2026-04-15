@@ -1,5 +1,13 @@
+import { headers } from "next/headers";
 import { getEvent } from "@/lib/store";
+import { translations } from "@/lib/i18n";
 import { CalendarButtons } from "./CalendarButtons";
+
+async function serverLang(): Promise<"en" | "fr"> {
+  const h = await headers();
+  const al = h.get("accept-language") ?? "";
+  return al.toLowerCase().startsWith("fr") ? "fr" : "en";
+}
 
 function parseLocalParts(dateStr: string) {
   const [datePart, timePart] = dateStr.split("T");
@@ -49,15 +57,16 @@ function googleCalendarUrl(event: {
 
 export default async function EventPage(props: { params: Promise<{ id: string }> }) {
   const { id } = await props.params;
-  const event = await getEvent(id);
+  const [event, lang] = await Promise.all([getEvent(id), serverLang()]);
+  const s = translations[lang];
 
   if (!event) {
     return (
       <main style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: 24 }}>
         <p style={{ fontSize: 48, margin: "0 0 16px" }}>🕳️</p>
-        <h1 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 700 }}>Event not found</h1>
-        <p style={{ margin: 0, color: "#71717A", fontSize: 14 }}>This link may have expired or never existed.</p>
-        <a href="/" style={{ marginTop: 24, fontSize: 14, color: "#A855F7", textDecoration: "none" }}>← Back to Datote</a>
+        <h1 style={{ margin: "0 0 8px", fontSize: 22, fontWeight: 700 }}>{s.eventNotFound}</h1>
+        <p style={{ margin: 0, color: "#71717A", fontSize: 14 }}>{s.eventNotFoundDesc}</p>
+        <a href="/" style={{ marginTop: 24, fontSize: 14, color: "#A855F7", textDecoration: "none" }}>{s.backToHome}</a>
       </main>
     );
   }
@@ -78,16 +87,18 @@ export default async function EventPage(props: { params: Promise<{ id: string }>
         <div style={{ display: "grid", gap: 10 }}>
           <Meta icon="📅" text={formatDisplay(event.date, event.timezone)} />
           {event.location && <Meta icon="📍" text={event.location} />}
-          {event.onlineLink && (
+          {/* Links — handle both new `links[]` and legacy `onlineLink` */}
+          {(event.links ?? (event.onlineLink ? [event.onlineLink] : [])).map((url, i) => (
             <Meta
-              icon="🔗"
+              key={i}
+              icon={linkIcon(url)}
               text={
-                <a href={event.onlineLink} target="_blank" rel="noopener noreferrer" style={{ color: "#A855F7", textDecoration: "none" }}>
-                  Watch / join online
+                <a href={url} target="_blank" rel="noopener noreferrer" style={{ color: "#A855F7", textDecoration: "none" }}>
+                  {linkLabel(url)}
                 </a>
               }
             />
-          )}
+          ))}
         </div>
       </div>
 
@@ -96,13 +107,41 @@ export default async function EventPage(props: { params: Promise<{ id: string }>
         googleHref={googleCalendarUrl(event)}
       />
 
-      <p style={{ marginTop: 40, textAlign: "center", fontSize: 12, color: "#3F3F46" }}>
-        Shared via <a href="/" style={{ color: "#71717A", textDecoration: "none" }}>Datote</a>
-        {" · "}by Mindful Machine
-      </p>
+      <footer style={{ marginTop: 64, textAlign: "center", fontSize: 12, color: "#3F3F46" }}>
+        {s.by}
+      </footer>
     </main>
   );
 }
+
+const LINK_MAP: Record<string, { label: string; icon: string }> = {
+  "youtube.com":     { label: "Watch on YouTube",       icon: "▶️" },
+  "youtu.be":        { label: "Watch on YouTube",       icon: "▶️" },
+  "twitch.tv":       { label: "Watch on Twitch",        icon: "▶️" },
+  "tiktok.com":      { label: "Watch on TikTok",        icon: "▶️" },
+  "zoom.us":         { label: "Join on Zoom",           icon: "📹" },
+  "meet.google.com": { label: "Join on Google Meet",    icon: "📹" },
+  "instagram.com":   { label: "Follow on Instagram",    icon: "📱" },
+  "twitter.com":     { label: "Follow on X",            icon: "📱" },
+  "x.com":           { label: "Follow on X",            icon: "📱" },
+  "eventbrite.com":  { label: "Get Tickets",            icon: "🎟️" },
+  "eventbrite.fr":   { label: "Get Tickets",            icon: "🎟️" },
+  "patreon.com":     { label: "Support on Patreon",     icon: "💜" },
+  "ko-fi.com":       { label: "Support on Ko-fi",       icon: "💜" },
+  "paypal.com":      { label: "Donate via PayPal",      icon: "💜" },
+  "linktr.ee":       { label: "Linktree",               icon: "🔗" },
+};
+
+function resolveLinkMeta(url: string) {
+  try {
+    const host = new URL(url).hostname.replace(/^www\./, "");
+    return LINK_MAP[host] ?? { label: host, icon: "🔗" };
+  } catch {
+    return { label: "Visit link", icon: "🔗" };
+  }
+}
+function linkLabel(url: string) { return resolveLinkMeta(url).label; }
+function linkIcon(url: string)  { return resolveLinkMeta(url).icon; }
 
 function Meta({ icon, text }: { icon: string; text: React.ReactNode }) {
   return (

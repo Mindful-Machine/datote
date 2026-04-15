@@ -36,9 +36,9 @@ export async function GET(
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Datote//Datote//EN",
+    "PRODID:-//Pindate//Pindate//EN",
     "BEGIN:VEVENT",
-    `UID:${id}@datote.app`,
+    `UID:${id}@pindate.app`,
     `SUMMARY:${event.title}`,
     `DTSTART;TZID=${event.timezone}:${start}`,
     `DTEND;TZID=${event.timezone}:${end}`,

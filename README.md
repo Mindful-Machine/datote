@@ -1,12 +1,14 @@
-# Datote
+# Pindate
 
-Turn a link into a calendar event. Built for creators — share a link, your audience clicks once and the event lands in their calendar.
+Pin your event. Share a link. Your audience adds it in one click.
+
+Built for creators — generate a shareable URL and your audience can instantly add the event to Google Calendar, Apple Calendar, or Outlook.
 
 ## What it does
 
 1. Creator fills in event details (title, date, time, duration, timezone, location, online link)
-2. App generates a unique shareable URL like `datote.app/e/abc123`
-3. Anyone who opens that link can add the event to **Google Calendar**, **Apple Calendar**, or **Outlook** in one click
+2. App generates a unique shareable URL like `pindate.app/e/abc123`
+3. Anyone who opens that link adds the event to their calendar in one click
 
 ---
 
@@ -21,13 +23,17 @@ Turn a link into a calendar event. Built for creators — share a link, your aud
 
 ```bash
 # 1. Clone the repo
-git clone https://github.com/Mindful-Machine/datote.git
-cd datote
+git clone https://github.com/Mindful-Machine/pindate.git
+cd pindate
 
 # 2. Install dependencies
 npm install
 
-# 3. Start the dev server
+# 3. Add environment variables
+cp .env.local.example .env.local
+# Fill in your Upstash Redis credentials
+
+# 4. Start the dev server
 npm run dev
 ```
 
@@ -41,7 +47,7 @@ Then open **http://localhost:3000** in your browser.
 | `http://localhost:3000/new` | Create a new event |
 | `http://localhost:3000/e/[id]` | Shareable event page |
 | `http://localhost:3000/api/events` | POST — create event (JSON) |
-| `http://localhost:3000/api/events/[id]/ical` | GET — download .ics file |
+| `http://localhost:3000/api/events/[id]/ical` | GET — .ics file for Apple/Outlook |
 
 ---
 
@@ -59,30 +65,20 @@ src/
 │       ├── route.ts                  # POST /api/events
 │       └── [id]/ical/route.ts        # GET /api/events/[id]/ical (.ics)
 └── lib/
-    └── store.ts                      # In-memory store (⚠️ replace with Redis before deploy)
+    ├── store.ts                      # saveEvent / getEvent helpers
+    └── redis.ts                      # Upstash Redis client
 ```
 
 ---
 
-## Deploying to Vercel
+## Environment variables
 
-> ⚠️ **Before deploying:** the current store is in-memory and resets on every server restart. Replace it with Upstash Redis first (see below).
+| Variable | Description |
+|----------|-------------|
+| `UPSTASH_REDIS_REST_URL` | Upstash Redis REST URL |
+| `UPSTASH_REDIS_REST_TOKEN` | Upstash Redis REST token |
 
-### 1. Add a database (Upstash Redis — free)
-
-1. Create a free account at [upstash.com](https://upstash.com)
-2. Create a new Redis database
-3. Copy `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`
-
-### 2. Deploy
-
-```bash
-# Push latest code to GitHub
-git push
-
-# Then go to vercel.com → New Project → import Mindful-Machine/datote
-# Add the two Upstash env vars in the Vercel dashboard
-```
+Get them free at [upstash.com](https://upstash.com).
 
 ---
 
@@ -91,6 +87,7 @@ git push
 - **Next.js 16** (App Router) + **React 19**
 - **TypeScript**
 - **Tailwind CSS v4**
+- **Upstash Redis** — persistent event storage
 - **Geist** font (Vercel)
 - **Nominatim / OpenStreetMap** — free location autocomplete, no API key
 

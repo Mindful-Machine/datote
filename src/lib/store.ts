@@ -6,7 +6,8 @@ export type EventData = {
   timezone: string;     // e.g. "Europe/Paris"
   durationMin: number;  // e.g. 120
   location?: string;    // physical address (optional)
-  onlineLink?: string;  // YouTube Live, TikTok, Zoom, etc. (optional)
+  links?: string[];     // up to 10 URLs (tickets, socials, streams, donations…)
+  onlineLink?: string;  // deprecated — kept for backwards compat with old events
 };
 
 export async function getEvent(id: string): Promise<EventData | null> {
