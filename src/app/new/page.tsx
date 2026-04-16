@@ -13,16 +13,6 @@ const TIMEZONES = [
   "Asia/Tokyo",
 ];
 
-function makeTimeOptions(stepMinutes = 15) {
-  const out: string[] = [];
-  for (let h = 0; h < 24; h++) {
-    for (let m = 0; m < 60; m += stepMinutes) {
-      out.push(`${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`);
-    }
-  }
-  return out;
-}
-const TIME_OPTIONS = makeTimeOptions(15);
 
 function getDefaultDateTime() {
   const now = new Date();
@@ -264,10 +254,7 @@ export default function NewEventPage() {
             <input className="d-input" type="date" value={dateISO} onChange={(e) => setDateISO(e.target.value)} />
           </Field>
           <Field label={t("time")} emoji="🕐">
-            <select className="d-input" value={time} onChange={(e) => setTime(e.target.value)}>
-              <option value="" disabled>hh:mm</option>
-              {TIME_OPTIONS.map((t) => <option key={t} value={t}>{t}</option>)}
-            </select>
+            <input className="d-input" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
           </Field>
         </div>
 
@@ -411,7 +398,7 @@ export default function NewEventPage() {
           </p>
           <div style={{ display: "flex", gap: 10 }}>
             <a
-              href={result.link}
+              href={`${result.link}?edit=1`}
               style={{ flex: 1, padding: "10px 0", borderRadius: 8, border: "1px solid #166534", background: "transparent", color: "#86EFAC", textDecoration: "none", textAlign: "center", fontSize: 13, fontWeight: 600 }}
             >{t("open")}</a>
             <button
